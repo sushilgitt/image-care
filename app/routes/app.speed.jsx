@@ -1,5 +1,6 @@
 import PageHeader from "../components/PageHeader";
-import { GaugeIcon } from "@shopify/polaris-icons";
+import { GaugeIcon, PageIcon, DatabaseIcon, ImagesIcon, ChartVerticalIcon } from "@shopify/polaris-icons";
+import { KpiGrid } from "../components/Brand";
 import { useState, useCallback, useEffect } from 'react';
 import { useLoaderData, useSubmit, useNavigation, useActionData, redirect } from 'react-router';
 import { authenticate } from '../shopify.server';
@@ -447,25 +448,12 @@ export default function PageSpeedImpactReports() {
 
         {/* Measured optimization results */}
         <Layout.Section>
-          <div className="pl-statbar">
-            <div className="pl-stat">
-              <p className="pl-stat-label">Pages optimized</p>
-              <p className="pl-stat-value">{`${optimizedProducts}`}<span style={{ fontSize: 14, fontWeight: 500, color: 'var(--pl-muted)' }}>{` / ${totalProducts}`}</span></p>
-            </div>
-            <div className="pl-stat">
-              <p className="pl-stat-label">Space saved</p>
-              <p className="pl-stat-value is-good">{`${totalSavedMB.toFixed(1)} MB`}</p>
-            </div>
-            <div className="pl-stat">
-              <p className="pl-stat-label">Images optimized</p>
-              <p className="pl-stat-value">{totalImagesOptimized.toLocaleString()}</p>
-            </div>
-            <div className="pl-stat">
-              <p className="pl-stat-label">Average reduction</p>
-              <p className="pl-stat-value">{`${avgCompression.toFixed(0)}%`}</p>
-              <p className="pl-stat-hint">Measured from real file sizes</p>
-            </div>
-          </div>
+          <KpiGrid items={[
+            { icon: PageIcon, label: 'Pages optimized', value: `${optimizedProducts}`, suffix: `/ ${totalProducts}` },
+            { icon: DatabaseIcon, label: 'Space saved', value: `${totalSavedMB.toFixed(1)} MB`, tone: 'good' },
+            { icon: ImagesIcon, label: 'Images optimized', value: totalImagesOptimized.toLocaleString() },
+            { icon: ChartVerticalIcon, label: 'Average reduction', value: `${avgCompression.toFixed(0)}%`, hint: 'Measured from real file sizes' },
+          ]} />
         </Layout.Section>
 
         {/* Live PageSpeed Test */}

@@ -1,17 +1,17 @@
 import { Icon } from "@shopify/polaris";
 
-// Branded header shown at the top of each feature page.
+// Header shown at the top of each feature page.
 export default function PageHeader({ icon, eyebrow, title, subtitle }) {
   return (
-    <div className="pl-page-head">
-      <span className="pl-page-head-icon">
+    <header className="ic-head">
+      <span className="ic-head-icon">
         <Icon source={icon} />
       </span>
-      <div className="pl-page-head-text">
-        {eyebrow && <p className="pl-page-head-eyebrow">{eyebrow}</p>}
-        <p className="pl-page-head-title">{title}</p>
-        {subtitle && <p className="pl-page-head-sub">{subtitle}</p>}
+      <div className="ic-head-text">
+        {eyebrow && <p className="ic-eyebrow">{eyebrow}</p>}
+        <h1 className="ic-head-title">{title}</h1>
+        {subtitle && <p className="ic-head-sub">{subtitle}</p>}
       </div>
-    </div>
+    </header>
   );
 }

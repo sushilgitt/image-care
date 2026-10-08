@@ -12,34 +12,32 @@ import { LogoMark, CheckGlyph } from "./Brand";
 // charged is set on the Partner Dashboard plans, so keep the two in sync.
 export default function PricingTiers({ pricingUrl }) {
   return (
-    <div className="pl-pricing">
-      <header className="pl-soft pl-pricing-band">
-        <span className="pl-chip"><LogoMark size={18} />Image Care plans</span>
-        <h1>
-          Faster product pages, <span className="pl-accent">at any size.</span>
-        </h1>
+    <div className="ic-pricing">
+      <header className="ic-pricing-band">
+        <span className="ic-brandline"><LogoMark size={24} light />Image Care plans</span>
+        <h1>Pick the plan that fits your catalog</h1>
         <p>
-          Optimize photos, write alt text with AI and measure the speed you gain. Start free and
-          upgrade only when your catalog needs it.
+          Compress photos to WebP, write alt text with AI and measure page speed. Start free and
+          upgrade when your store grows.
         </p>
       </header>
 
-      <div className="pl-pricing-grid">
+      <div className="ic-pricing-grid">
         {PLAN_TIERS.map((tier) => (
-          <div key={tier.name} className={`pl-price-card${tier.popular ? " is-popular" : ""}`}>
-            {tier.popular && <span className="pl-price-flag">MOST POPULAR</span>}
-            <p className="pl-price-name">{tier.name}</p>
-            <p className="pl-price-tag">{tier.tagline}</p>
-            <p className="pl-price-amount">
-              {`$${tier.price}`}<span>per month</span>
+          <div key={tier.name} className={`ic-price-card${tier.popular ? " is-popular" : ""}`}>
+            {tier.popular && <span className="ic-price-flag">MOST POPULAR</span>}
+            <p className="ic-price-name">{tier.name}</p>
+            <p className="ic-price-tag">{tier.tagline}</p>
+            <p className="ic-price-amount">
+              {`$${tier.price}`}<span>/ month</span>
             </p>
-            <p className="pl-price-annual">
+            <p className="ic-price-annual">
               {tier.price === 0 ? "Free forever, no card required" : `Or $${tier.priceAnnual}/year and save ~17%`}
             </p>
-            <a href={pricingUrl} target="_top" className={`pl-btn ${tier.popular ? "pl-btn-primary" : "pl-btn-outline"} pl-price-cta`}>
+            <a href={pricingUrl} target="_top" className={`ic-btn ${tier.popular ? "ic-btn-primary" : "ic-btn-outline"} ic-price-cta`}>
               {tier.price === 0 ? "Start free" : `Choose ${tier.name}`}
             </a>
-            <ul className="pl-price-features">
+            <ul className="ic-ticks">
               {tier.features.map((f) => (
                 <li key={f}><CheckGlyph />{f}</li>
               ))}
@@ -48,7 +46,7 @@ export default function PricingTiers({ pricingUrl }) {
         ))}
       </div>
 
-      <p className="pl-pricing-foot">Billed securely through Shopify. Change or cancel your plan at any time.</p>
+      <p className="ic-pricing-foot">Billed securely through Shopify. Change or cancel your plan at any time.</p>
     </div>
   );
 }

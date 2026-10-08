@@ -1,5 +1,6 @@
 import PageHeader from "../components/PageHeader";
-import { MagicIcon } from "@shopify/polaris-icons";
+import { MagicIcon, ProductIcon, ImagesIcon, EditIcon, CheckCircleIcon } from "@shopify/polaris-icons";
+import { KpiGrid } from "../components/Brand";
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useLoaderData, useSubmit, useNavigation, useActionData, useFetcher, redirect } from 'react-router';
 import { authenticate } from '../shopify.server';
@@ -676,24 +677,12 @@ export default function AltTextSuggestions() {
         )}
 
         <Layout.Section>
-          <div className="pl-statbar">
-            <div className="pl-stat">
-              <p className="pl-stat-label">Products</p>
-              <p className="pl-stat-value">{productCount.toLocaleString()}</p>
-            </div>
-            <div className="pl-stat">
-              <p className="pl-stat-label">Images</p>
-              <p className="pl-stat-value">{totalImages.toLocaleString()}</p>
-            </div>
-            <div className="pl-stat">
-              <p className="pl-stat-label">Awaiting review</p>
-              <p className={`pl-stat-value${pendingCount > 0 ? ' is-warn' : ''}`}>{pendingCount.toLocaleString()}</p>
-            </div>
-            <div className="pl-stat">
-              <p className="pl-stat-label">Applied</p>
-              <p className="pl-stat-value is-good">{appliedCount.toLocaleString()}</p>
-            </div>
-          </div>
+          <KpiGrid items={[
+            { icon: ProductIcon, label: 'Products', value: productCount.toLocaleString() },
+            { icon: ImagesIcon, label: 'Images', value: totalImages.toLocaleString() },
+            { icon: EditIcon, label: 'Awaiting review', value: pendingCount.toLocaleString(), tone: pendingCount > 0 ? 'warn' : undefined },
+            { icon: CheckCircleIcon, label: 'Applied', value: appliedCount.toLocaleString(), tone: 'good' },
+          ]} />
         </Layout.Section>
 
         <Layout.Section>

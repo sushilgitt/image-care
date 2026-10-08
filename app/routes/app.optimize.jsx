@@ -1,5 +1,5 @@
 import PageHeader from "../components/PageHeader";
-import { ImageMagicIcon } from "@shopify/polaris-icons";
+import { ImageMagicIcon, ProductIcon, AlertTriangleIcon, ImagesIcon, DatabaseIcon } from "@shopify/polaris-icons";
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useLoaderData, useFetcher, useRevalidator } from 'react-router';
 import { authenticate } from '../shopify.server';
@@ -8,7 +8,7 @@ import { getUsage, getRemaining } from '../usage.server';
 import { entitled } from '../plans.server';
 import db from '../db.server';
 import { mapLimit, headSizeMB, optimizeBatch } from '../optimize.server';
-import { RingGauge, Meter } from '../components/Brand';
+import { Meter, KpiGrid } from '../components/Brand';
 import { fetchAllProducts, imageNodes, parseSummary, MAX_MEDIA_PER_PRODUCT } from '../catalog.server';
 import {
   Page,
@@ -444,10 +444,10 @@ export default function ProductOptimization() {
   const allSelected = selectedProducts.length === displayedProducts.length && displayedProducts.length > 0;
 
   const kpis = [
-    { label: 'Products', value: stats.total.toLocaleString() },
-    { label: 'Not optimized', value: stats.needsOptimization.toLocaleString(), tone: stats.needsOptimization > 0 ? 'warn' : undefined },
-    { label: 'Images', value: stats.totalImages.toLocaleString() },
-    { label: 'Space saved', value: formatBytes(liveSavings), tone: 'good' },
+    { icon: ProductIcon, label: 'Products', value: stats.total.toLocaleString() },
+    { icon: AlertTriangleIcon, label: 'Not optimized', value: stats.needsOptimization.toLocaleString(), tone: stats.needsOptimization > 0 ? 'warn' : undefined },
+    { icon: ImagesIcon, label: 'Images', value: stats.totalImages.toLocaleString() },
+    { icon: DatabaseIcon, label: 'Space saved', value: formatBytes(liveSavings), tone: 'good' },
   ];
 
   return (
@@ -468,83 +468,76 @@ export default function ProductOptimization() {
           </Layout.Section>
         )}
 
-        {/* Overview: monthly quota · auto-optimize · catalog stats */}
+        {/* Control bar: monthly quota · auto-optimize */}
         <Layout.Section>
-          <div className="pl-overview">
-            <div className="pl-soft pl-quota">
-              <RingGauge pct={usagePct} size={96} stroke={9} label={`${usagePct}% of monthly images used`}>
-                <span className="pl-ring-num" style={{ fontSize: 18 }}>{`${usagePct}%`}</span>
-              </RingGauge>
-              <div>
-                <p className="pl-quota-label">This month</p>
-                <p className="pl-quota-plan">{`${usedImages.toLocaleString()} / ${quota.toLocaleString()}`}</p>
-                <p className={`pl-quota-note${quotaReached ? ' is-alert' : ''}`}>
-                  {quotaReached
-                    ? 'Monthly limit reached. Upgrade to keep optimizing.'
-                    : `${plan?.name || 'Free'} plan · ${Math.max(0, quota - usedImages).toLocaleString()} images left`}
-                </p>
+          <div className="ic-controlbar">
+            <div className="ic-control">
+              <div className="ic-control-head">
+                <p className="ic-eyebrow">{`${plan?.name || 'Free'} plan · this month`}</p>
+                <p className="ic-control-figure">{usedImages.toLocaleString()}<span>{`/ ${quota.toLocaleString()} images`}</span></p>
               </div>
+              <Meter pct={usagePct} label={`${usagePct}% of monthly images used`} />
+              <p className={`ic-control-note${quotaReached ? ' is-alert' : ''}`}>
+                {quotaReached
+                  ? 'Monthly limit reached. Upgrade to keep optimizing.'
+                  : `${Math.max(0, quota - usedImages).toLocaleString()} images left. Resets on the 1st.`}
+              </p>
             </div>
 
-            <div className="pl-card pl-auto">
-              <div className="pl-auto-head">
-                <p className="pl-card-title">Auto-Optimize</p>
+            <div className="ic-control">
+              <div className="ic-control-head">
+                <p className="ic-eyebrow">Auto-Optimize</p>
                 {plan?.autoOptimizeAllowed
                   ? <Badge tone={autoOptimize ? 'success' : undefined}>{autoOptimize ? 'On' : 'Off'}</Badge>
                   : <Badge tone="attention">Growth+</Badge>}
               </div>
-              <p className="pl-card-sub" style={{ marginTop: 0 }}>Optimize photos on new products automatically in the background.</p>
               {plan?.autoOptimizeAllowed ? (
                 <Checkbox
                   label="Optimize new products automatically"
+                  helpText="Runs in the background whenever a product is created."
                   checked={autoOptimize}
                   onChange={handleToggleAutoOptimize}
                   disabled={settingsFetcher.state !== 'idle'}
                 />
               ) : (
-                <Text variant="bodySm" as="p" tone="subdued">Available on the Growth and Pro plans.</Text>
+                <Text variant="bodySm" as="p" tone="subdued">Optimize new products automatically. Available on the Growth and Pro plans.</Text>
               )}
-            </div>
-
-            <div className="pl-statbar pl-mini-stats">
-              {kpis.map(k => (
-                <div key={k.label} className="pl-stat">
-                  <p className="pl-stat-label">{k.label}</p>
-                  <p className={`pl-stat-value${k.tone ? ` is-${k.tone}` : ''}`}>{k.value}</p>
-                </div>
-              ))}
             </div>
           </div>
         </Layout.Section>
 
+        <Layout.Section>
+          <KpiGrid items={kpis} />
+        </Layout.Section>
+
         {/* Product list */}
         <Layout.Section>
-          <div className="pl-list">
-            <div className="pl-toolbar">
-              <div className="pl-tabs" role="tablist" aria-label="Filter products">
+          <div className="ic-table">
+            <div className="ic-table-bar">
+              <div className="ic-seg" role="tablist" aria-label="Filter products">
                 {filterOptions.map(o => (
                   <button
                     key={o.value}
                     type="button"
                     role="tab"
                     aria-selected={filter === o.value}
-                    className={`pl-tab${filter === o.value ? ' is-active' : ''}`}
+                    className={`ic-seg-btn${filter === o.value ? ' is-active' : ''}`}
                     onClick={() => handleFilterChange(o.value)}
                     disabled={isBusy}
                   >
                     {o.label}
-                    <span className="pl-tab-count">{filterCounts[o.value]}</span>
+                    <span className="ic-seg-count">{filterCounts[o.value]}</span>
                   </button>
                 ))}
               </div>
-              <div className="pl-toolbar-sort">
+              <div className="ic-table-sort">
                 <Box width="220px">
                   <Select label="Sort" labelInline options={sortOptions} value={sortBy} onChange={handleSortChange} disabled={isBusy} />
                 </Box>
               </div>
             </div>
 
-            <div className="pl-row pl-row-head">
+            <div className="ic-row ic-row-head">
               <Checkbox
                 label="Select all"
                 labelHidden
@@ -571,7 +564,7 @@ export default function ProductOptimization() {
                 const selected = selectedProducts.includes(product.id);
                 const scoreTone = product.score >= 80 ? 'good' : product.score >= 60 ? 'warn' : 'bad';
                 return (
-                  <div key={product.id} className={`pl-row${selected ? ' is-selected' : ''}${isActive ? ' is-active' : ''}`}>
+                  <div key={product.id} className={`ic-row${selected ? ' is-selected' : ''}${isActive ? ' is-active' : ''}`}>
                     <Checkbox
                       label={`Select ${product.title}`}
                       labelHidden
@@ -580,25 +573,25 @@ export default function ProductOptimization() {
                       disabled={isBusy}
                     />
                     <Thumbnail source={product.featuredImageUrl || ImageMagicIcon} alt={product.title} size="small" />
-                    <div className="pl-row-main">
-                      <p className="pl-row-title">{product.title}</p>
-                      <p className="pl-row-meta">
+                    <div className="ic-row-main">
+                      <p className="ic-row-title">{product.title}</p>
+                      <p className="ic-row-meta">
                         {`${product.status.charAt(0) + product.status.slice(1).toLowerCase()} · ${product.imageCount} ${product.imageCount === 1 ? 'image' : 'images'} · ${product.imagesWithAlt}/${product.imageCount} with alt text`}
-                        {isActive && <span className="pl-live">Optimizing</span>}
+                        {isActive && <span className="ic-live">Optimizing</span>}
                       </p>
                     </div>
-                    <div className="pl-row-progress">
+                    <div className="ic-row-progress">
                       <span>{`${product.optimizedImages} of ${product.imageCount}`}</span>
                       <Meter pct={product.score} label={`${product.score}% optimized`} />
                     </div>
-                    <div className="pl-row-saved">
+                    <div className="ic-row-saved">
                       <strong>{formatBytes(product.sizeSavedMB)}</strong>
                       <span>{`from ${formatBytes(product.totalOriginalSizeMB)}`}</span>
                     </div>
-                    <span className={`pl-score pl-score-${scoreTone}`}>
+                    <span className={`ic-score ic-score-${scoreTone}`}>
                       {`${product.score}%`}
                     </span>
-                    <div className="pl-row-action">
+                    <div className="ic-row-action">
                       {product.needsOptimization ? (
                         <Button size="slim" variant="primary" onClick={() => handleOptimizeProduct(product.id)} loading={isActive} disabled={isBusy || quotaReached}>
                           Optimize
@@ -616,11 +609,11 @@ export default function ProductOptimization() {
       </Layout>
 
       {selectedProducts.length > 0 && (
-        <div className="pl-bulkbar" role="region" aria-label="Bulk actions">
-          <span className="pl-bulkbar-count"><b>{selectedProducts.length}</b>{`product${selectedProducts.length === 1 ? '' : 's'} selected`}</span>
-          <div className="pl-bulkbar-actions">
-            <button type="button" className="pl-btn pl-btn-ghost" onClick={() => setSelectedProducts([])} disabled={isBusy}>Clear</button>
-            <button type="button" className="pl-btn pl-btn-bright" onClick={handleOptimizeSelected} disabled={isBusy || quotaReached}>
+        <div className="ic-bulkbar" role="region" aria-label="Bulk actions">
+          <span className="ic-bulkbar-count"><b>{selectedProducts.length}</b>{`product${selectedProducts.length === 1 ? '' : 's'} selected`}</span>
+          <div className="ic-bulkbar-actions">
+            <button type="button" className="ic-btn ic-btn-onbrand" onClick={() => setSelectedProducts([])} disabled={isBusy}>Clear</button>
+            <button type="button" className="ic-btn ic-btn-light" onClick={handleOptimizeSelected} disabled={isBusy || quotaReached}>
               {isBusy ? 'Optimizing…' : 'Optimize selected'}
             </button>
           </div>

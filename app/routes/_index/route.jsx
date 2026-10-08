@@ -1,4 +1,5 @@
 import { redirect } from "react-router";
+import { LogoMark } from "../../components/Brand";
 import styles from "./styles.module.css";
 
 export const loader = async ({ request }) => {
@@ -31,43 +32,33 @@ const FEATURES = [
 export default function App() {
   return (
     <main className={styles.page}>
+      <section className={styles.band}>
+        <div className={styles.shell}>
+          <header className={styles.brand}>
+            <LogoMark size={30} light />
+            Image Care
+          </header>
+          <h1 className={styles.heading}>Make every product photo lighter.</h1>
+          <p className={styles.text}>
+            Image Care compresses your Shopify product images to WebP, writes alt text with AI and
+            measures how much faster your product pages load.
+          </p>
+          <p className={styles.note}>
+            Install Image Care from the Shopify App Store, then open it from <strong>Apps</strong> in
+            your Shopify admin.
+          </p>
+        </div>
+      </section>
+
       <div className={styles.shell}>
-        <header className={styles.brand}>
-          <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-            <rect width="24" height="24" rx="7" fill="#22C55E" />
-            <circle cx="11.5" cy="13" r="5.25" fill="none" stroke="#fff" strokeWidth="2.2" />
-            <circle cx="18" cy="6" r="2.1" fill="#fff" />
-          </svg>
-          Image Care
-        </header>
-
-        <section className={styles.hero}>
-          <div>
-            <h1 className={styles.heading}>
-              Lighter photos. <span>Faster store.</span>
-            </h1>
-            <p className={styles.text}>
-              Image Care optimizes your Shopify product images, writes alt text with AI and
-              measures how much faster your product pages load.
-            </p>
-            <p className={styles.note}>
-              Install Image Care from the Shopify App Store, then open it from <strong>Apps</strong> in
-              your Shopify admin.
-            </p>
-          </div>
-
-          <ol className={styles.list}>
-            {FEATURES.map((f, i) => (
-              <li key={f.title}>
-                <span className={styles.num}>{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <strong>{f.title}</strong>
-                  <p>{f.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <ul className={styles.grid}>
+          {FEATURES.map((f) => (
+            <li key={f.title}>
+              <strong>{f.title}</strong>
+              <p>{f.text}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </main>
   );
